@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Para mi Sol ✨</title>
+  <meta name="description" content="Una sorpresa para Sol" />
+  <style>
+    :root{
+      --bg:#07060d;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --glow: rgba(255,255,255,.18);
+      --accent: rgba(255, 170, 220, .85);
+      --accent2: rgba(120, 190, 255, .85);
+    }
+    *{ box-sizing:border-box; }
+    body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  overflow-x:hidden;
+  background: var(--bg);
+}
+    /* subtle moving glow */
+    .aurora{
+      position:fixed; inset:-40vmax;
+      background: conic-gradient(from 180deg at 50% 50%,
+        rgba(255,170,220,.18), rgba(120,190,255,.16), rgba(255,255,255,.08), rgba(255,170,220,.18));
+      filter: blur(80px);
+      animation: drift 18s ease-in-out infinite alternate;
+      opacity:.55;
+      pointer-events:none;
+      z-index:0;
+    }
+    @keyframes drift{
+      from{ transform: translate3d(-2%, -1%, 0) rotate(0deg) scale(1.05); }
+      to{   transform: translate3d( 2%,  1%, 0) rotate(12deg) scale(1.12); }
+    }
+
+    /* sparkles */
+    canvas#stars{ position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.9; }
+
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+    header{
+      margin-top: 22px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,170,220,.15), rgba(120,190,255,.12));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing:.2px;
+    }
+    .title{
+      font-size: clamp(30px, 4.2vw, 54px);
+      line-height:1.05;
+      margin: 4px 0 0;
+      letter-spacing: -0.6px;
+      text-shadow: 0 10px 40px rgba(0,0,0,.35);
+    }
+    .subtitle{
+      margin: 0;
+      font-size: clamp(14px, 1.8vw, 18px);
+      color: var(--muted);
+      max-width: 60ch;
+    }
+    .grid{
+      margin-top: 22px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      justify-items: center;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--card), rgba(0,0,0,.15));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+    }
+    .card h2{
+      margin: 0 0 10px;
+      font-size: 16px;
+      font-weight: 650;
+      color: rgba(255,255,255,.88);
+      letter-spacing:.2px;
+    }
+   .type{
+  font-size: clamp(16px, 2vw, 20px);
+  line-height:1.65;
+  color: rgba(255,255,255,.92);
+  min-height: 7.5em;
+
+  /* FIX IMPORTANTE */
+  white-space: normal;
+  letter-spacing: 0.2px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+    .type .cursor{
+      display:inline-block;
+      width: 10px;
+      animation: blink 1s steps(1) infinite;
+      opacity:.85;
+    }
+    @keyframes blink { 50% { opacity:0; } }
+
+    .countdown{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .unit{
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--card2), rgba(0,0,0,.12));
+      border: 1px solid rgba(255,255,255,.12);
+      min-width: 112px;
+      text-align:center;
+    }
+    .num{
+      font-size: 26px;
+      font-weight: 750;
+      letter-spacing: .2px;
+      text-shadow: 0 8px 20px rgba(0,0,0,.25);
+    }
+    .lab{
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .6px;
+      text-transform: uppercase;
+    }
+
+    .btnrow{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(90deg, rgba(255,170,220,.22), rgba(120,190,255,.18));
+      color: rgba(255,255,255,.92);
+      padding: 11px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 650;
+      letter-spacing:.2px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.25);
+      transition: transform .15s ease, filter .15s ease;
+    }
+    button:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    button:active{ transform: translateY(0px) scale(.99); }
+
+    .playBtn{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.10);
+  color: rgba(255,255,255,.92);
+  padding: 10px 14px;
+  border-radius: 14px;
+  cursor:pointer;
+  font-weight: 650;
+  letter-spacing:.2px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.18);
+  backdrop-filter: blur(10px);
+}
+.playBtn:hover{ filter: brightness(1.06); }
+.playBtnRow{ margin-top: 10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.playHint{ color: var(--muted); font-size: 12.5px; margin: 0; }
+
+    .small{
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+      margin: 10px 0 0;
+    }
+    .bigLine{
+      display:block;
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: 750;
+      color: rgba(255,255,255,.92);
+      letter-spacing: -0.2px;
+    }
+
+    .reveal{
+      margin-top: 16px;
+      overflow:hidden;
+      max-height: 0px;
+      opacity:0;
+      transition: max-height 1s ease, opacity 1s ease;
+    }
+    .reveal.open{
+      max-height: 1200px;
+      opacity:1;
+    }
+
+    .heroImg{
+      margin-top: 14px;
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+    }
+    .heroImg img{
+      width:100%; height:auto; display:block;
+      filter: contrast(1.05) saturate(1.05);
+    }
+    .caption{
+      padding: 12px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+
+    footer{
+      margin-top: 18px;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      text-align:center;
+    }
+    .heart{ filter: drop-shadow(0 6px 12px rgba(0,0,0,.25)); }
+    .bg{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bgVideo{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.03);
+  filter: saturate(1.05) contrast(1.05);
+}
+
+.bgOverlay{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg, rgba(7,6,13,.70), rgba(7,6,13,.82));
+}
+
+/* asegúrate que tu contenido esté arriba del video */
+.wrap{
+  position: relative;
+  z-index: 1;
+}
+
+/* NEW CSS RULES */
+.hero{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  align-items:flex-start;
+}
+.primaryCta{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.18);
+  background: linear-gradient(90deg, rgba(255,170,220,.24), rgba(120,190,255,.20));
+  color: rgba(255,255,255,.95);
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor:pointer;
+  font-weight: 750;
+  letter-spacing:.2px;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  transition: transform .15s ease, filter .15s ease;
+}
+.primaryCta:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+.primaryCta:active{ transform: translateY(0px) scale(.99); }
+
+.hiddenStart{ display:none !important; }
+
+.revealBlock{
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .8s ease, transform .8s ease;
+}
+.revealBlock.show{
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+/* Center everything */
+header{ align-items:center; text-align:center; }
+.hero{ align-items:center; width:100%; }
+.hero .title{ text-align:center; }
+.primaryCta{ align-self:center; }
+
+/* Center the revealed block and card */
+#afterStart .grid{ justify-items:center; }
+#afterStart .card{ text-align:center; }
+
+/* Center countdown card and image */
+#afterStart .card{
+  width: min(920px, 100%);
+  margin: 0 auto;
+}
+#afterStart .heroImg{
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.countdown{ justify-content:center; }
+
+footer{ text-align:center; }
+  </style>
+</head>
+<body>
+  <audio id="bgAudio" src="audio.mp3" preload="auto" loop></audio>
+  <div class="bg">
+  <video class="bgVideo" autoplay muted loop playsinline preload="auto">
+    <source src="nyc.mp4" type="video/mp4" />
+  </video>
+  <div class="bgOverlay"></div>
+</div>
+  <div class="aurora"></div>
+  <canvas id="stars"></canvas>
+
+  <div class="wrap">
+    <header>
+  <div class="hero">
+    <h1 class="title">Feliz cumpleaños mi Sol, vamos de la mano a disfrutar juntos esta nueva aventura ❤️</h1>
+    <button id="startBtn" class="primaryCta">Haz Click Aquí para ver tu sorpresa</button>
+  </div>
+</header>
+
+    <div id="afterStart" class="hiddenStart revealBlock">
+  <div class="grid">
+    <aside class="card">
+      <h2>Cuenta regresiva</h2>
+      <div class="countdown" aria-live="polite">
+        <div class="unit"><div class="num" id="d">—</div><div class="lab">Días</div></div>
+        <div class="unit"><div class="num" id="h">—</div><div class="lab">Horas</div></div>
+        <div class="unit"><div class="num" id="m">—</div><div class="lab">Minutos</div></div>
+        <div class="unit"><div class="num" id="s">—</div><div class="lab">Segundos</div></div>
+      </div>
+      <p class="small" id="targetText"></p>
+
+      <div class="heroImg" style="margin-top:16px;">
+        <img id="kissImg" src="marieli.jpeg" alt="Sorpresa" />
+        <div class="caption" id="finalCaption">🖤</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+    <footer>
+      Con todo mi amor y corazón, Eli 💕
+    </footer>
+  </div>
+
+  <script>
+    // ========= CONFIG =========
+    // Fecha objetivo: 2 abril 2026, 05:45 AM Monterrey (UTC-6)
+    // Si tu fecha real es 2025, cámbiala a "2025-04-07T05:45:00-06:00"
+    const TARGET_ISO = "2026-04-02T05:45:00-06:00";
+    const targetMs = new Date(TARGET_ISO).getTime();
+
+    // ========= START ACTION =========
+    const startBtn = document.getElementById("startBtn");
+    const afterStart = document.getElementById("afterStart");
+
+    function show(el){
+      el.classList.remove("hiddenStart");
+      // allow layout, then animate
+      requestAnimationFrame(() => el.classList.add("show"));
+    }
+
+    startBtn.addEventListener("click", async () => {
+      // 1) Start background audio (requires user click)
+      const bgAudio = document.getElementById("bgAudio");
+      if (bgAudio) {
+        try {
+          bgAudio.volume = 0.45;
+          await bgAudio.play();
+        } catch (e) {
+          // If autoplay is blocked for any reason, show native controls as fallback
+          bgAudio.controls = true;
+          bgAudio.style.display = "block";
+          bgAudio.style.marginTop = "12px";
+        }
+      }
+
+      // 2) Reveal countdown + photo
+      show(afterStart);
+
+      // 3) Clean up button
+      startBtn.disabled = true;
+      startBtn.style.opacity = "0.7";
+      startBtn.textContent = "Sorpresaaaaa ❤️";
+    });
+
+    // ========= COUNTDOWN =========
+    const dEl = document.getElementById("d");
+    const hEl = document.getElementById("h");
+    const mEl = document.getElementById("m");
+    const sEl = document.getElementById("s");
+
+    const finalCaption = document.getElementById("finalCaption");
+    const targetText = document.getElementById("targetText");
+
+    function pad(n){ return String(n).padStart(2,"0"); }
+
+    function updateCountdown(){
+      const now = Date.now();
+      let diff = targetMs - now;
+
+      if (!Number.isFinite(targetMs)){
+        targetText.textContent = "La fecha objetivo no es válida. Revisa TARGET_ISO.";
+        return;
+      }
+
+      const targetLocal = new Date(TARGET_ISO);
+      const whenStr = targetLocal.toLocaleString("es-MX", {
+        weekday:"long", year:"numeric", month:"long", day:"numeric",
+        hour:"2-digit", minute:"2-digit"
+      });
+
+      targetText.innerHTML =
+        `Cuenta regresiva para: ${whenStr} (hora Torreón).` +
+        `<br><span class="bigLine">Hagamos realidad esta foto y muchas más 👀😍😍❤️</span>`;
+
+      if (diff <= 0){
+        dEl.textContent = "0";
+        hEl.textContent = "00";
+        mEl.textContent = "00";
+        sEl.textContent = "00";
+
+        // desbloquear final
+        finalCaption.textContent = "Ya es hoy. Nos vamos a Nueva York 🗽✈️";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000*60*60*24));
+      diff -= days * (1000*60*60*24);
+      const hours = Math.floor(diff / (1000*60*60));
+      diff -= hours * (1000*60*60);
+      const mins = Math.floor(diff / (1000*60));
+      diff -= mins * (1000*60);
+      const secs = Math.floor(diff / 1000);
+
+      dEl.textContent = String(days);
+      hEl.textContent = pad(hours);
+      mEl.textContent = pad(mins);
+      sEl.textContent = pad(secs);
+    }
+
+    // ========= STARS CANVAS =========
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
+    let W, H, stars;
+
+    function resize(){
+      W = canvas.width = window.innerWidth * devicePixelRatio;
+      H = canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      stars = Array.from({length: Math.floor((window.innerWidth*window.innerHeight)/14000)}, () => ({
+        x: Math.random()*W, y: Math.random()*H,
+        r: (Math.random()*1.2 + 0.4) * devicePixelRatio,
+        a: Math.random()*0.7 + 0.2,
+        tw: Math.random()*0.02 + 0.005
+      }));
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      for (const s of stars){
+        s.a += (Math.random() - 0.5) * s.tw;
+        s.a = Math.max(0.12, Math.min(0.85, s.a));
+        ctx.globalAlpha = s.a;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        ctx.fillStyle = "white";
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", resize);
+
+    // ========= INIT =========
+    (function init(){
+      resize();
+      draw();
+      // Countdown starts updating immediately, even if hidden
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    })();
+  </script>
+  <!-- Coloca un archivo llamado audio.mp3 (música que tengas derecho a usar) en la misma carpeta que index.html -->
+</body>
+</html>
