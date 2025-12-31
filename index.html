@@ -17,12 +17,15 @@
       --accent2: rgba(120, 190, 255, .85);
     }
     *{ box-sizing:border-box; }
-    body{
+body{
   margin:0;
   min-height:100vh;
   color:var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
   overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   background: var(--bg);
 }
     /* subtle moving glow */
@@ -49,7 +52,7 @@
       z-index:1;
       max-width: 980px;
       margin: 0 auto;
-      padding: 28px 18px 56px;
+      padding: 28px 16px 56px;
     }
     header{
       margin-top: 22px;
@@ -252,6 +255,7 @@
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .bgVideo{
@@ -260,12 +264,14 @@
   object-fit: cover;
   transform: scale(1.03);
   filter: saturate(1.05) contrast(1.05);
+  pointer-events: none;
 }
 
 .bgOverlay{
   position:absolute;
   inset:0;
   background: linear-gradient(180deg, rgba(7,6,13,.70), rgba(7,6,13,.82));
+  pointer-events: none;
 }
 
 /* asegúrate que tu contenido esté arriba del video */
@@ -332,6 +338,39 @@ header{ align-items:center; text-align:center; }
 .countdown{ justify-content:center; }
 
 footer{ text-align:center; }
+
+/* --- Mobile fixes: better sizing + smooth scroll --- */
+@media (max-width: 520px){
+  .wrap{ padding: 18px 14px 40px; }
+
+  .title{
+    font-size: clamp(26px, 7.2vw, 36px);
+    line-height: 1.06;
+    letter-spacing: -0.5px;
+  }
+
+  .primaryCta{ width: 100%; max-width: 360px; }
+
+  #afterStart .card{ width: 100%; padding: 16px; }
+
+  /* Make countdown fit nicely on S23 width */
+  .countdown{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    justify-items: stretch;
+  }
+  .unit{ min-width: 0; width: 100%; padding: 10px 12px; }
+  .num{ font-size: 30px; }
+  .lab{ font-size: 11px; }
+
+  .bigLine{ font-size: 17px; }
+}
+
+@media (max-width: 380px){
+  .title{ font-size: 28px; }
+  .num{ font-size: 28px; }
+}
   </style>
 </head>
 <body>
@@ -484,7 +523,9 @@ footer{ text-align:center; }
       H = canvas.height = window.innerHeight * devicePixelRatio;
       canvas.style.width = window.innerWidth + "px";
       canvas.style.height = window.innerHeight + "px";
-      stars = Array.from({length: Math.floor((window.innerWidth*window.innerHeight)/14000)}, () => ({
+      const isMobile = window.innerWidth <= 520;
+      const divisor = isMobile ? 24000 : 14000;
+      stars = Array.from({length: Math.floor((window.innerWidth*window.innerHeight)/divisor)}, () => ({
         x: Math.random()*W, y: Math.random()*H,
         r: (Math.random()*1.2 + 0.4) * devicePixelRatio,
         a: Math.random()*0.7 + 0.2,
