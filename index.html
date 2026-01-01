@@ -374,7 +374,7 @@ footer{ text-align:center; }
   </style>
 </head>
 <body>
-  <audio id="bgAudio" src="audio.mp3" preload="auto" loop></audio>
+  <audio id="bgAudio" src="wake-me-up.mp3" preload="auto" loop playsinline></audio>
   <div class="bg">
   <video class="bgVideo" autoplay muted loop playsinline preload="auto">
     <source src="nyc.mp4" type="video/mp4" />
@@ -388,7 +388,7 @@ footer{ text-align:center; }
     <header>
   <div class="hero">
     <h1 class="title">Feliz cumpleaños mi Sol, vamos de la mano a disfrutar juntos esta nueva aventura ❤️</h1>
-    <button id="startBtn" class="primaryCta">Haz Click Aquí para ver tu sorpresa</button>
+    <button id="startBtn" class="primaryCta">Haz Click Aquí para ver tu sorpresa (No olvides subir el volúmen de tu cel 🤭)</button>
   </div>
 </header>
 
@@ -435,14 +435,15 @@ footer{ text-align:center; }
     }
 
     startBtn.addEventListener("click", async () => {
-      // 1) Start background audio (requires user click)
+      // 1) Start background audio (browsers usually require a user gesture)
       const bgAudio = document.getElementById("bgAudio");
       if (bgAudio) {
         try {
           bgAudio.volume = 0.45;
+          bgAudio.loop = true; // ensure it repeats when it ends
           await bgAudio.play();
         } catch (e) {
-          // If autoplay is blocked for any reason, show native controls as fallback
+          // If autoplay is blocked, show native controls as fallback
           bgAudio.controls = true;
           bgAudio.style.display = "block";
           bgAudio.style.marginTop = "12px";
@@ -554,11 +555,37 @@ footer{ text-align:center; }
     (function init(){
       resize();
       draw();
+      // Try to autoplay background audio on page load.
+      // Note: mobile browsers often block autoplay with sound until the user taps.
+      const bgAudio = document.getElementById("bgAudio");
+      if (bgAudio) {
+        bgAudio.loop = true; // repeat from the beginning when it ends
+        bgAudio.volume = 0.45;
+
+        const tryPlay = async () => {
+          try {
+            await bgAudio.play();
+          } catch (_) {
+            // Autoplay blocked; we will start audio on the first user interaction.
+            const resume = async () => {
+              try { await bgAudio.play(); } catch (_) {}
+              window.removeEventListener("pointerdown", resume);
+              window.removeEventListener("touchstart", resume);
+              window.removeEventListener("keydown", resume);
+            };
+            window.addEventListener("pointerdown", resume, { once: true });
+            window.addEventListener("touchstart", resume, { once: true });
+            window.addEventListener("keydown", resume, { once: true });
+          }
+        };
+
+        tryPlay();
+      }
       // Countdown starts updating immediately, even if hidden
       updateCountdown();
       setInterval(updateCountdown, 1000);
     })();
   </script>
-  <!-- Coloca un archivo llamado audio.mp3 (música que tengas derecho a usar) en la misma carpeta que index.html -->
+  <!-- Coloca un archivo llamado wake-me-up.mp3 (música que tengas derecho a usar) en la misma carpeta que index.html -->
 </body>
 </html>
